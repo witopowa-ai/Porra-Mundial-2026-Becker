@@ -187,6 +187,7 @@ label{display:block;font-size:.72rem;color:var(--gray);margin-bottom:.22rem;lett
     </div>
     <div class="flex-gap">
       <button class="btn btn-primary" id="btn-save" onclick="saveUser()">💾 Guardar pronósticos</button>
+      <button class="btn btn-ghost" onclick="downloadPDF()">🖨️ Descargar mi pronóstico</button>
       <button class="btn btn-ghost" onclick="cancelProno()">Cancelar</button>
     </div>
     <div id="save-msg" style="margin-top:.7rem;"></div>
@@ -214,7 +215,7 @@ label{display:block;font-size:.72rem;color:var(--gray);margin-bottom:.22rem;lett
         <button class="btn btn-primary" onclick="unlockAdmin()">Entrar</button>
       </div>
       <div id="pwd-err" style="color:#FF6B75;font-size:.78rem;margin-top:.5rem;"></div>
-      <p style="margin-top:1rem;font-size:.76rem;color:var(--gray);">Contraseña: <strong style="color:var(--gold)">mundial2026</strong></p>
+
     </div>
   </div>
   <div id="admin-panel" class="hidden">
@@ -276,16 +277,84 @@ const GROUPS = {
 
 const TEAMS = [...new Set(Object.values(GROUPS).flat())].sort();
 
-function genGroupMatches(){
-  const m=[];let id=1;
-  Object.entries(GROUPS).forEach(([g,ts])=>{
-    for(let i=0;i<ts.length;i++)
-      for(let j=i+1;j<ts.length;j++)
-        m.push({id:`G${id++}`,group:g,home:ts[i],away:ts[j]});
-  });
-  return m;
-}
-const GROUP_MATCHES = genGroupMatches();
+// Partidos en orden cronológico según fixture oficial
+const GROUP_MATCHES = [
+  // Jornada 1
+  {id:'G1', group:'A', home:'México',         away:'Sudáfrica',      date:'11 Jun'},
+  {id:'G2', group:'A', home:'Corea del Sur',  away:'Rep. Checa',     date:'11 Jun'},
+  {id:'G3', group:'B', home:'Canadá',         away:'Bosnia',         date:'12 Jun'},
+  {id:'G4', group:'C', home:'Brasil',         away:'Marruecos',      date:'13 Jun'},
+  {id:'G5', group:'C', home:'Escocia',        away:'Haití',          date:'13 Jun'},
+  {id:'G6', group:'B', home:'Qatar',          away:'Suiza',          date:'13 Jun'},
+  {id:'G7', group:'D', home:'EE.UU.',         away:'Paraguay',       date:'12 Jun'},
+  {id:'G8', group:'D', home:'Australia',      away:'Turquía',        date:'12 Jun'},
+  {id:'G9', group:'E', home:'Alemania',       away:'Costa de Marfil',date:'15 Jun'},
+  {id:'G10',group:'E', home:'Ecuador',        away:'Curazao',        date:'15 Jun'},
+  {id:'G11',group:'F', home:'Países Bajos',   away:'Japón',          date:'15 Jun'},
+  {id:'G12',group:'F', home:'Túnez',          away:'Suecia',         date:'15 Jun'},
+  {id:'G13',group:'G', home:'Bélgica',        away:'Egipto',         date:'16 Jun'},
+  {id:'G14',group:'G', home:'Irán',           away:'Nueva Zelanda',  date:'16 Jun'},
+  {id:'G15',group:'H', home:'España',         away:'Uruguay',        date:'15 Jun'},
+  {id:'G16',group:'H', home:'Arabia Saudí',   away:'Cabo Verde',     date:'15 Jun'},
+  {id:'G17',group:'I', home:'Francia',        away:'Senegal',        date:'16 Jun'},
+  {id:'G18',group:'I', home:'Irak',           away:'Noruega',        date:'16 Jun'},
+  {id:'G19',group:'J', home:'Argentina',      away:'Argelia',        date:'16 Jun'},
+  {id:'G20',group:'J', home:'Austria',        away:'Jordania',       date:'16 Jun'},
+  {id:'G21',group:'K', home:'Portugal',       away:'RD Congo',       date:'17 Jun'},
+  {id:'G22',group:'K', home:'Uzbekistán',     away:'Colombia',       date:'17 Jun'},
+  {id:'G23',group:'L', home:'Inglaterra',     away:'Croacia',        date:'17 Jun'},
+  {id:'G24',group:'L', home:'Ghana',          away:'Panamá',         date:'17 Jun'},
+  // Jornada 2
+  {id:'G25',group:'A', home:'México',         away:'Corea del Sur',  date:'18 Jun'},
+  {id:'G26',group:'A', home:'Sudáfrica',      away:'Rep. Checa',     date:'18 Jun'},
+  {id:'G27',group:'B', home:'Suiza',          away:'Bosnia',         date:'18 Jun'},
+  {id:'G28',group:'B', home:'Canadá',         away:'Qatar',          date:'18 Jun'},
+  {id:'G29',group:'C', home:'Brasil',         away:'Haití',          date:'19 Jun'},
+  {id:'G30',group:'C', home:'Escocia',        away:'Marruecos',      date:'19 Jun'},
+  {id:'G31',group:'D', home:'EE.UU.',         away:'Australia',      date:'19 Jun'},
+  {id:'G32',group:'D', home:'Turquía',        away:'Paraguay',       date:'19 Jun'},
+  {id:'G33',group:'E', home:'Alemania',       away:'Ecuador',        date:'21 Jun'},
+  {id:'G34',group:'E', home:'Costa de Marfil',away:'Curazao',        date:'21 Jun'},
+  {id:'G35',group:'F', home:'Países Bajos',   away:'Túnez',          date:'21 Jun'},
+  {id:'G36',group:'F', home:'Suecia',         away:'Japón',          date:'21 Jun'},
+  {id:'G37',group:'G', home:'Bélgica',        away:'Irán',           date:'22 Jun'},
+  {id:'G38',group:'G', home:'Nueva Zelanda',  away:'Egipto',         date:'22 Jun'},
+  {id:'G39',group:'H', home:'España',         away:'Arabia Saudí',   date:'21 Jun'},
+  {id:'G40',group:'H', home:'Uruguay',        away:'Cabo Verde',     date:'21 Jun'},
+  {id:'G41',group:'I', home:'Francia',        away:'Irak',           date:'22 Jun'},
+  {id:'G42',group:'I', home:'Noruega',        away:'Senegal',        date:'22 Jun'},
+  {id:'G43',group:'J', home:'Argentina',      away:'Austria',        date:'22 Jun'},
+  {id:'G44',group:'J', home:'Argelia',        away:'Jordania',       date:'22 Jun'},
+  {id:'G45',group:'K', home:'Portugal',       away:'Uzbekistán',     date:'23 Jun'},
+  {id:'G46',group:'K', home:'Colombia',       away:'RD Congo',       date:'23 Jun'},
+  {id:'G47',group:'L', home:'Inglaterra',     away:'Ghana',          date:'23 Jun'},
+  {id:'G48',group:'L', home:'Panamá',         away:'Croacia',        date:'23 Jun'},
+  // Jornada 3
+  {id:'G49', group:'A', home:'Rep. Checa',    away:'México',         date:'24 Jun'},
+  {id:'G50', group:'A', home:'Sudáfrica',     away:'Corea del Sur',  date:'24 Jun'},
+  {id:'G51', group:'B', home:'Qatar',         away:'Bosnia',         date:'24 Jun'},
+  {id:'G52', group:'B', home:'Suiza',         away:'Canadá',         date:'24 Jun'},
+  {id:'G53', group:'C', home:'Marruecos',     away:'Haití',          date:'24 Jun'},
+  {id:'G54', group:'C', home:'Brasil',        away:'Escocia',        date:'24 Jun'},
+  {id:'G55', group:'D', home:'Turquía',       away:'EE.UU.',         date:'25 Jun'},
+  {id:'G56', group:'D', home:'Paraguay',      away:'Australia',      date:'25 Jun'},
+  {id:'G57', group:'E', home:'Curazao',       away:'Alemania',       date:'25 Jun'},
+  {id:'G58', group:'E', home:'Ecuador',       away:'Costa de Marfil',date:'25 Jun'},
+  {id:'G59', group:'F', home:'Japón',         away:'Túnez',          date:'25 Jun'},
+  {id:'G60', group:'F', home:'Suecia',        away:'Países Bajos',   date:'25 Jun'},
+  {id:'G61', group:'G', home:'Nueva Zelanda', away:'Bélgica',        date:'26 Jun'},
+  {id:'G62', group:'G', home:'Egipto',        away:'Irán',           date:'26 Jun'},
+  {id:'G63', group:'H', home:'Cabo Verde',    away:'España',         date:'26 Jun'},
+  {id:'G64', group:'H', home:'Uruguay',       away:'Arabia Saudí',   date:'26 Jun'},
+  {id:'G65', group:'I', home:'Senegal',       away:'Irak',           date:'27 Jun'},
+  {id:'G66', group:'I', home:'Noruega',       away:'Francia',        date:'27 Jun'},
+  {id:'G67', group:'J', home:'Jordania',      away:'Argentina',      date:'27 Jun'},
+  {id:'G68', group:'J', home:'Argelia',       away:'Austria',        date:'27 Jun'},
+  {id:'G69', group:'K', home:'RD Congo',      away:'Uzbekistán',     date:'27 Jun'},
+  {id:'G70', group:'K', home:'Colombia',      away:'Portugal',       date:'27 Jun'},
+  {id:'G71', group:'L', home:'Croacia',       away:'Ghana',          date:'27 Jun'},
+  {id:'G72', group:'L', home:'Panamá',        away:'Inglaterra',     date:'27 Jun'},
+];
 
 function scoreMatch(pred,real){
   if(!real||real.home===''||real.away==='') return 0;
@@ -464,7 +533,7 @@ function showGroupFor(g,existing){
         <input type="number" class="score-in" min="0" max="20" id="p_${m.id}_h" value="${pred.home??''}" placeholder="—">
         <span class="sep">—</span>
         <input type="number" class="score-in" min="0" max="20" id="p_${m.id}_a" value="${pred.away??''}" placeholder="—">
-      </div><div class="m-grp">Grupo ${g}</div></div>
+      </div><div class="m-grp">${m.date}</div></div>
       <div class="t-name r">${m.away}</div>
     </div>`;
   }).join('');
@@ -733,6 +802,147 @@ window.resetAll=async function(){
   await fsDel('config','classified');
   await fsDel('config','goleador');
   hideLoad(); toast('Todo reseteado'); tabAdmin('jugadores',null);
+};
+
+// ── PDF / PRINT ──────────────────────────────────────────────
+window.downloadPDF = function(){
+  if(!currentUser){ toast('Primero guarda tus pronósticos','err'); return; }
+
+  const matches = collectMatches();
+  const cl32  = Array.from({length:32}, (_,i) => document.getElementById('c32_'+i)?.value||'').filter(Boolean);
+  const cl16  = Array.from({length:16}, (_,i) => document.getElementById('c16_'+i)?.value||'').filter(Boolean);
+  const clQF  = Array.from({length:8},  (_,i) => document.getElementById('cQF_'+i)?.value||'').filter(Boolean);
+  const clSF  = Array.from({length:4},  (_,i) => document.getElementById('cSF_'+i)?.value||'').filter(Boolean);
+  const fin1  = document.getElementById('sel-fin1').value;
+  const fin2  = document.getElementById('sel-fin2').value;
+  const camp  = document.getElementById('sel-camp').value;
+  const gol   = document.getElementById('inp-gol').value.trim();
+
+  // Group matches by group
+  const byGroup = {};
+  GROUP_MATCHES.forEach(m => {
+    if(!byGroup[m.group]) byGroup[m.group] = [];
+    const pred = matches[m.id];
+    byGroup[m.group].push({ ...m, pred });
+  });
+
+  const groupColors = {A:'#E63946',B:'#F4A261',C:'#2A9D8F',D:'#457B9D',E:'#6A0572',F:'#E9C46A',G:'#264653',H:'#E76F51',I:'#118AB2',J:'#06D6A0',K:'#FFB703',L:'#8338EC'};
+
+  const groupsHTML = Object.entries(byGroup).map(([g, ms]) => `
+    <div class="group-block">
+      <div class="group-header" style="background:${groupColors[g]||'#1B3A6B'}">GRUPO ${g}</div>
+      <table class="match-table">
+        ${ms.map(m => {
+          const sc = m.pred ? `${m.pred.home} — ${m.pred.away}` : '__ — __';
+          return `<tr>
+            <td class="team home">${m.home}</td>
+            <td class="score">${sc}</td>
+            <td class="team away">${m.away}</td>
+            <td class="date">${m.date}</td>
+          </tr>`;
+        }).join('')}
+      </table>
+    </div>`).join('');
+
+  const tagList = (arr, color) => arr.length
+    ? arr.map(t=>`<span class="tag" style="border-color:${color}">${t}</span>`).join('')
+    : '<span style="color:#666">—</span>';
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Pronósticos ${currentUser} — Mundial 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#07101E;color:#F0F4FF;font-family:'Barlow',sans-serif;padding:1.5cm;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+  .header{text-align:center;margin-bottom:1.5rem;border-bottom:2px solid #F0B429;padding-bottom:1rem;}
+  .header h1{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:.1em;background:linear-gradient(135deg,#F0B429,#fff 50%,#F0B429);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .header h2{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;letter-spacing:.3em;color:#F0B429;text-transform:uppercase;margin-top:.3rem;}
+  .header .nombre{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:#fff;margin-top:.5rem;letter-spacing:.15em;}
+
+  .groups-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;}
+  .group-block{background:#0F1C30;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,.08);}
+  .group-header{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.15em;padding:.4rem .7rem;text-align:center;}
+  .match-table{width:100%;border-collapse:collapse;font-size:.75rem;}
+  .match-table tr{border-bottom:1px solid rgba(255,255,255,.05);}
+  .match-table tr:last-child{border-bottom:none;}
+  .match-table td{padding:.35rem .5rem;}
+  .team{color:#e0e8ff;}
+  .team.home{text-align:right;width:38%;}
+  .team.away{text-align:left;width:38%;}
+  .score{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#F0B429;width:16%;white-space:nowrap;}
+  .date{text-align:right;font-size:.65rem;color:#6B7FA3;width:8%;white-space:nowrap;}
+
+  .section{background:#0F1C30;border-radius:6px;padding:1rem;margin-bottom:1rem;border:1px solid rgba(255,255,255,.08);}
+  .section-title{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;color:#F0B429;margin-bottom:.6rem;font-weight:700;}
+  .tags{display:flex;flex-wrap:wrap;gap:.4rem;}
+  .tag{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;padding:.15rem .5rem;border-radius:3px;border:1px solid;letter-spacing:.05em;}
+
+  .final-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem;}
+  .final-box{background:#0F1C30;border-radius:6px;padding:.9rem;text-align:center;border:1px solid rgba(255,255,255,.08);}
+  .final-label{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:#6B7FA3;margin-bottom:.3rem;}
+  .final-value{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:#F0B429;letter-spacing:.05em;}
+
+  .footer{text-align:center;margin-top:1.5rem;font-size:.7rem;color:#6B7FA3;font-family:'Barlow Condensed',sans-serif;letter-spacing:.1em;border-top:1px solid rgba(255,255,255,.07);padding-top:.8rem;}
+
+  @media print{
+    body{padding:.8cm;}
+    @page{size:A4;margin:.8cm;}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Mundial 2026</h1>
+  <h2>USA · Canadá · México</h2>
+  <div class="nombre">📋 ${currentUser}</div>
+</div>
+
+<div class="groups-grid">${groupsHTML}</div>
+
+<div class="final-grid">
+  <div class="final-box"><div class="final-label">Finalista 1 · 30 pts</div><div class="final-value">${fin1||'—'}</div></div>
+  <div class="final-box"><div class="final-label">Finalista 2 · 30 pts</div><div class="final-value">${fin2||'—'}</div></div>
+  <div class="final-box" style="border-color:rgba(240,180,41,.4)"><div class="final-label">🏆 Campeón · 50 pts</div><div class="final-value" style="font-size:1.6rem">${camp||'—'}</div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">👟 Máximo Goleador · 30 pts</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:#F0B429">${gol||'—'}</div>
+</div>
+
+<div class="section">
+  <div class="section-title">🔢 Clasificados a 32avos · 10 pts c/u</div>
+  <div class="tags">${tagList(cl32,'#457B9D')}</div>
+</div>
+
+<div class="section">
+  <div class="section-title">⚡ Clasificados a Octavos · 15 pts c/u</div>
+  <div class="tags">${tagList(cl16,'#2A9D8F')}</div>
+</div>
+
+<div class="section">
+  <div class="section-title">🔥 Clasificados a Cuartos · 20 pts c/u</div>
+  <div class="tags">${tagList(clQF,'#E9C46A')}</div>
+</div>
+
+<div class="section">
+  <div class="section-title">💥 Clasificados a Semis · 25 pts c/u</div>
+  <div class="tags">${tagList(clSF,'#E63946')}</div>
+</div>
+
+<div class="footer">Porra Mundial 2026 · witopowa-ai.github.io/Porra-Mundial-2026-Becker</div>
+
+<script>window.onload=()=>window.print();<\/script>
+</body></html>`;
+
+  const win = window.open('','_blank');
+  win.document.write(html);
+  win.document.close();
 };
 
 showLoad();
