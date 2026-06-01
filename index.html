@@ -935,6 +935,9 @@ window.unlockAdmin=function(){
 
 
 
+function adminTeamSel(id){ return `<select id="${id}">${teamsByGroup(null)}</select>`; }
+function setVal(id,val){ setTimeout(()=>{ const el=document.getElementById(id); if(el&&val) el.value=val; },80); }
+
 window.tabAdmin=async function(tab,btn){
   document.querySelectorAll('#admin-panel .tab').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
@@ -963,23 +966,17 @@ window.tabAdmin=async function(tab,btn){
     window._adminCurrentGroup = 'A';
 
     adminRenderGroup('A', results);
+    hideLoad();
 
   } else if(tab==='clasificados'){
     const classifiedDoc=await fsGet('config','classified');
     const classified=classifiedDoc?.data||{}; hideLoad();
 
-    // Use teamsByGroup for proper grouped selects
-    function adminTeamSel(id, val){
-      return `<select id="${id}">${teamsByGroup(null)}</select>`;
-    }
-    function setVal(id,val){ setTimeout(()=>{ const el=document.getElementById(id); if(el&&val) el.value=val; },50); }
-
     const mk=(phase,count,prefix,label,pts)=>{
       const html=`<div class="card"><div class="card-title">${label} — ${pts} pts c/u</div>
-        <div class="g4">${Array.from({length:count},(_,i)=>`<div><label>Equipo ${i+1}</label>${adminTeamSel('a'+prefix+i,'')}</div>`).join('')}</div>
+        <div class="g4">${Array.from({length:count},(_,i)=>`<div><label>Equipo ${i+1}</label>${adminTeamSel('a'+prefix+i)}</div>`).join('')}</div>
         <div style="margin-top:.8rem"><button class="btn btn-success btn-sm" onclick="saveClassified('${phase}',${count},'a${prefix}')">Guardar</button></div>
       </div>`;
-      // Restore values after render
       (classified[phase]||[]).forEach((v,i)=>setVal('a'+prefix+i,v));
       return html;
     };
