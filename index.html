@@ -120,6 +120,7 @@ label{display:block;font-size:.72rem;color:var(--gray);margin-bottom:.22rem;lett
     <button class="nav-btn active" onclick="nav('ranking',this)">🏆 Clasificación</button>
     <button class="nav-btn" onclick="nav('pronosticos',this)">✏️ Mis Pronósticos</button>
     <button class="nav-btn" onclick="nav('partidos',this)">⚽ Partidos</button>
+    <button class="nav-btn" onclick="nav('puntos',this)">📋 Puntuación</button>
     <button class="nav-btn" onclick="nav('admin',this)">🔧 Admin</button>
   </nav>
 </header>
@@ -194,6 +195,82 @@ label{display:block;font-size:.72rem;color:var(--gray);margin-bottom:.22rem;lett
   </div>
 </div>
 
+<div id="view-puntos" class="view">
+  <div class="sec-title">Sistema de Puntuación</div>
+  <div class="sec-sub">Referencia rápida para todos los participantes</div>
+
+  <div class="card">
+    <div class="card-title">⚽ Partidos de Fase de Grupos</div>
+    <div style="display:flex;flex-direction:column;gap:.5rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.05);">
+        <span>Acertar el ganador del partido (o empate)</span>
+        <span class="badge b-gold" style="font-size:.85rem;padding:.2rem .7rem">5 pts</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.05);">
+        <span style="color:var(--gray2)">+ Acertar los goles de uno de los dos equipos</span>
+        <span class="badge b-blue" style="font-size:.85rem;padding:.2rem .7rem">+3 pts</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.05);">
+        <span style="color:var(--gray2)">+ Acertar el marcador exacto de ambos equipos</span>
+        <span class="badge b-blue" style="font-size:.85rem;padding:.2rem .7rem">+3 pts más</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;background:rgba(240,180,41,.05);border-radius:4px;padding:.6rem .8rem;margin-top:.3rem;">
+        <span style="font-weight:600;color:var(--gold)">Máximo por partido (ganador + goles + marcador exacto)</span>
+        <span class="badge b-gold" style="font-size:.9rem;padding:.25rem .8rem">11 pts</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🏟️ Fases Eliminatorias — Clasificados</div>
+    <div style="display:flex;flex-direction:column;gap:.5rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.05);">
+        <span>Acertar un clasificado a 32avos de final</span>
+        <span class="badge b-blue" style="font-size:.85rem;padding:.2rem .7rem">10 pts</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.05);">
+        <span>Acertar un clasificado a Octavos de final</span>
+        <span class="badge b-blue" style="font-size:.85rem;padding:.2rem .7rem">15 pts</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.05);">
+        <span>Acertar un clasificado a Cuartos de final</span>
+        <span class="badge b-blue" style="font-size:.85rem;padding:.2rem .7rem">20 pts</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.05);">
+        <span>Acertar un clasificado a Semifinales</span>
+        <span class="badge b-blue" style="font-size:.85rem;padding:.2rem .7rem">25 pts</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.05);">
+        <span>Acertar un Finalista</span>
+        <span class="badge b-blue" style="font-size:.85rem;padding:.2rem .7rem">30 pts</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🏆 Premios Especiales</div>
+    <div style="display:flex;flex-direction:column;gap:.5rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem .8rem;background:rgba(240,180,41,.07);border-radius:4px;border:1px solid rgba(240,180,41,.2);">
+        <span style="font-weight:600">Acertar el Campeón del Mundo</span>
+        <span class="badge b-gold" style="font-size:.9rem;padding:.25rem .8rem">50 pts</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem .8rem;background:rgba(39,171,131,.07);border-radius:4px;border:1px solid rgba(39,171,131,.2);margin-top:.3rem;">
+        <span style="font-weight:600">Acertar el Máximo Goleador</span>
+        <span class="badge b-green" style="font-size:.9rem;padding:.25rem .8rem">30 pts</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="background:rgba(27,58,107,.2);">
+    <div class="card-title">💡 Cómo se acumula</div>
+    <div style="font-size:.88rem;color:var(--gray2);line-height:1.7;">
+      Los puntos de partido son <strong style="color:var(--white)">acumulables</strong>: si aciertas ganador + goles de un equipo + marcador exacto sumas los tres.
+      <br>Los puntos de clasificados son <strong style="color:var(--white)">independientes por equipo</strong>: si pronosticas a España en octavos y pasa, sumas 15 pts independientemente de si acertaste o no en cuartos.
+      <br><br>La <strong style="color:var(--gold)">fase de grupos</strong> tiene mucho peso (48 partidos × hasta 11 pts) pero las <strong style="color:var(--gold)">fases eliminatorias</strong> son donde se decide el ganador de la porra.
+    </div>
+  </div>
+</div>
+
 <div id="view-partidos" class="view">
   <div class="sec-title">Resultados</div>
   <div class="sec-sub">Partidos jugados y puntos conseguidos</div>
@@ -226,6 +303,7 @@ label{display:block;font-size:.72rem;color:var(--gray);margin-bottom:.22rem;lett
       <button class="tab" onclick="tabAdmin('clasificados',this)">Clasificados</button>
       <button class="tab" onclick="tabAdmin('goleador',this)">Goleador</button>
       <button class="tab" onclick="tabAdmin('jugadores',this)">Participantes</button>
+      <button class="tab" onclick="tabAdmin('config',this)">⚙️ Config</button>
     </div>
     <div id="admin-body"></div>
   </div>
@@ -410,6 +488,7 @@ window.nav=function(view,btn){
   if(view==='ranking') renderRanking();
   if(view==='partidos'){ const t=document.querySelector('#view-partidos .tab'); tabPartidos('grupos',t); }
   if(view==='pronosticos') resetPronoForm();
+  // puntos view is static, no action needed
 };
 
 async function renderRanking(){
@@ -430,8 +509,8 @@ async function renderRanking(){
 
   const body=document.getElementById('ranking-body');
   if(!ranking.length){ body.innerHTML='<div style="text-align:center;color:var(--gray);padding:2rem;">¡Sé el primero en registrarte!</div>'; return; }
-  body.innerHTML=`<table class="rank-table"><thead><tr>
-    <th>#</th><th>Nombre</th><th>Grupos</th><th>Clasif.</th><th>Fases</th><th>Extras</th><th style="text-align:right">Total</th>
+  body.innerHTML=`<div style="overflow-x:auto;"><table class="rank-table" style="min-width:480px;"><thead><tr>
+    <th>#</th><th>Nombre</th><th>Grupos</th><th>Clasif.</th><th>Fases</th><th>Extras</th><th style="text-align:right;padding-right:0">Total</th>
   </tr></thead><tbody>${ranking.map((p,i)=>{
     const cls=i===0?'g':i===1?'s':i===2?'b':'';
     const fases=(p.bd.octavos||0)+(p.bd.cuartos||0)+(p.bd.semis||0)+(p.bd.finalistas||0);
@@ -443,9 +522,9 @@ async function renderRanking(){
       <td><span class="badge b-blue">${p.bd.cl32||0}</span></td>
       <td><span class="badge b-blue">${fases}</span></td>
       <td><span class="badge b-gold">${extras}</span></td>
-      <td class="rk-pts">${p.total}</td>
+      <td class="rk-pts" style="white-space:nowrap">${p.total}</td>
     </tr>`;
-  }).join('')}</tbody></table>`;
+  }).join('')}</tbody></table></div>`;
 }
 
 window.showDetail=async function(name){
@@ -487,6 +566,7 @@ let currentUser=null, cachedExisting=null;
 
 function resetPronoForm(){
   currentUser=null; cachedExisting=null;
+  Object.keys(tempMatches).forEach(k=>delete tempMatches[k]);
   document.getElementById('step-name').classList.remove('hidden');
   document.getElementById('prono-form').classList.add('hidden');
   document.getElementById('inp-name').value='';
@@ -497,9 +577,40 @@ window.loadUser=async function(){
   const name=document.getElementById('inp-name').value.trim();
   if(!name){ document.getElementById('name-msg').innerHTML='<div class="alert alert-err">Escribe tu nombre</div>'; return; }
   showLoad();
-  const existing=await fsGet('participants',name);
+  const [existing, deadlineDoc] = await Promise.all([
+    fsGet('participants',name),
+    fsGet('config','deadline')
+  ]);
   hideLoad();
+
+  // CHECK DEADLINE
+  const dl=deadlineDoc?.value||'';
+  if(dl && new Date()>new Date(dl) && !existing){
+    document.getElementById('name-msg').innerHTML=`<div class="alert alert-err">⏰ El plazo de registro ha terminado. No puedes apuntarte a la porra.</div>`;
+    return;
+  }
+
   currentUser=name; cachedExisting=existing;
+
+  // SELLADO o fuera de plazo: solo lectura
+  const pastDeadline = dl && new Date()>new Date(dl);
+  if(existing?.sealed || (pastDeadline && existing)){
+    document.getElementById('step-name').classList.add('hidden');
+    document.getElementById('prono-form').classList.remove('hidden');
+    document.getElementById('prono-status').innerHTML=existing?.sealed
+      ?`<strong>🔒 Pronósticos sellados.</strong> Ya imprimiste tus pronósticos y no puedes modificarlos. Si hay un error, contacta al organizador.`
+      :`<strong>⏰ Plazo cerrado.</strong> Ya no es posible editar los pronósticos.`;
+    buildGroupTabs(existing);
+    buildClassifiedInputs(existing);
+    buildFinals(existing);
+    setTimeout(()=>{
+      document.querySelectorAll('#prono-form input, #prono-form select').forEach(el=>el.disabled=true);
+      document.getElementById('btn-save').disabled=true;
+      document.getElementById('btn-save').style.opacity='.3';
+    },200);
+    return;
+  }
+
   document.getElementById('prono-status').textContent=existing
     ?`Editando pronósticos de ${name}. Modifica y guarda.`
     :`Nuevo: ${name}. Rellena tus pronósticos y guarda al final.`;
@@ -517,22 +628,38 @@ function buildGroupTabs(existing){
   showGroupFor('A',existing);
 }
 
+// Almacén temporal de marcadores mientras se rellena el formulario
+const tempMatches = {};
+
+function saveCurrentGroupToDom(){
+  GROUP_MATCHES.forEach(m=>{
+    const h=document.getElementById(`p_${m.id}_h`);
+    const a=document.getElementById(`p_${m.id}_a`);
+    if(h&&a){ tempMatches[m.id]={home:h.value,away:a.value}; }
+  });
+}
+
 window.showGroup=function(g,btn){
+  saveCurrentGroupToDom();
   document.querySelectorAll('#group-tabs .tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  showGroupFor(g,cachedExisting);
+  showGroupFor(g);
 };
 
-function showGroupFor(g,existing){
+function showGroupFor(g, existing){
   const matches=GROUP_MATCHES.filter(m=>m.group===g);
   document.getElementById('group-matches-wrap').innerHTML=matches.map(m=>{
-    const pred=existing?.matches?.[m.id]||{};
+    // Prioridad: valor en tempMatches > valor guardado en Firebase
+    const tmp=tempMatches[m.id];
+    const saved=existing?.matches?.[m.id]||cachedExisting?.matches?.[m.id]||{};
+    const valH = tmp?.home !== undefined && tmp.home !== '' ? tmp.home : (saved.home??'');
+    const valA = tmp?.away !== undefined && tmp.away !== '' ? tmp.away : (saved.away??'');
     return `<div class="match-row">
       <div class="t-name">${m.home}</div>
       <div><div class="score-wrap">
-        <input type="number" class="score-in" min="0" max="20" id="p_${m.id}_h" value="${pred.home??''}" placeholder="—">
+        <input type="number" class="score-in" min="0" max="20" id="p_${m.id}_h" value="${valH}" placeholder="—">
         <span class="sep">—</span>
-        <input type="number" class="score-in" min="0" max="20" id="p_${m.id}_a" value="${pred.away??''}" placeholder="—">
+        <input type="number" class="score-in" min="0" max="20" id="p_${m.id}_a" value="${valA}" placeholder="—">
       </div><div class="m-grp">${m.date}</div></div>
       <div class="t-name r">${m.away}</div>
     </div>`;
@@ -608,49 +735,98 @@ function buildFinals(existing){
   const selSF = getSelectedInPhase('cSF_', 4);
   const pool = selSF.length ? selSF : null;
   const base = teamsByGroup(pool);
-  ['sel-fin1','sel-fin2','sel-camp'].forEach(id=>document.getElementById(id).innerHTML=base);
+  ['sel-fin1','sel-fin2'].forEach(id=>{
+    document.getElementById(id).innerHTML=base;
+    document.getElementById(id).onchange=updateCampeonOptions;
+  });
   if(existing?.classified?.finalistas?.[0]) document.getElementById('sel-fin1').value=existing.classified.finalistas[0];
   if(existing?.classified?.finalistas?.[1]) document.getElementById('sel-fin2').value=existing.classified.finalistas[1];
+  updateCampeonOptions();
   if(existing?.campeon) document.getElementById('sel-camp').value=existing.campeon;
   if(existing?.goleador) document.getElementById('inp-gol').value=existing.goleador;
+}
+
+function updateCampeonOptions(){
+  const fin1=document.getElementById('sel-fin1').value;
+  const fin2=document.getElementById('sel-fin2').value;
+  const camp=document.getElementById('sel-camp');
+  const prev=camp.value;
+  if(fin1&&fin2){
+    camp.innerHTML=`<option value="">— Selecciona —</option>
+      <option value="${fin1}">${fin1}</option>
+      <option value="${fin2}">${fin2}</option>`;
+    if(prev===fin1||prev===fin2) camp.value=prev;
+  } else {
+    camp.innerHTML=`<option value="">— Elige primero los finalistas —</option>`;
+  }
 }
 
 function validateClassified(){
   const errors = [];
 
-  // Check all 32avos filled
+  // Partidos de grupo: al menos todos deben estar rellenos
+  const filledMatches = Object.keys(collectMatches()).length;
+  if(filledMatches < GROUP_MATCHES.length){
+    errors.push(`Faltan ${GROUP_MATCHES.length - filledMatches} partidos de grupo sin pronosticar`);
+  }
+
+  // 32avos
   const v32 = Array.from({length:32},(_,i)=>document.getElementById('c32_'+i)?.value||'');
   if(v32.filter(Boolean).length < 32) errors.push('Faltan equipos en 32avos de final');
   const dup32 = v32.filter((v,i)=>v&&v32.indexOf(v)!==i);
   if(dup32.length) errors.push(`Equipos repetidos en 32avos: ${[...new Set(dup32)].join(', ')}`);
 
+  // Octavos
   const v16 = Array.from({length:16},(_,i)=>document.getElementById('c16_'+i)?.value||'');
   if(v16.filter(Boolean).length < 16) errors.push('Faltan equipos en Octavos');
   const dup16 = v16.filter((v,i)=>v&&v16.indexOf(v)!==i);
   if(dup16.length) errors.push(`Equipos repetidos en Octavos: ${[...new Set(dup16)].join(', ')}`);
 
+  // Cuartos
   const vQF = Array.from({length:8},(_,i)=>document.getElementById('cQF_'+i)?.value||'');
   if(vQF.filter(Boolean).length < 8) errors.push('Faltan equipos en Cuartos');
   const dupQF = vQF.filter((v,i)=>v&&vQF.indexOf(v)!==i);
   if(dupQF.length) errors.push(`Equipos repetidos en Cuartos: ${[...new Set(dupQF)].join(', ')}`);
 
+  // Semis
   const vSF = Array.from({length:4},(_,i)=>document.getElementById('cSF_'+i)?.value||'');
   if(vSF.filter(Boolean).length < 4) errors.push('Faltan equipos en Semis');
   const dupSF = vSF.filter((v,i)=>v&&vSF.indexOf(v)!==i);
   if(dupSF.length) errors.push(`Equipos repetidos en Semis: ${[...new Set(dupSF)].join(', ')}`);
 
-  if(!document.getElementById('sel-fin1').value) errors.push('Falta Finalista 1');
-  if(!document.getElementById('sel-fin2').value) errors.push('Falta Finalista 2');
-  if(!document.getElementById('sel-camp').value) errors.push('Falta el Campeón');
+  // Finalistas
+  const fin1 = document.getElementById('sel-fin1').value;
+  const fin2 = document.getElementById('sel-fin2').value;
+  if(!fin1) errors.push('Falta Finalista 1');
+  if(!fin2) errors.push('Falta Finalista 2');
+  if(fin1 && fin2 && fin1===fin2) errors.push('Los dos finalistas no pueden ser el mismo equipo');
+
+  // Campeón debe ser uno de los dos finalistas
+  const camp = document.getElementById('sel-camp').value;
+  if(!camp) errors.push('Falta el Campeón');
+  if(camp && fin1 && fin2 && camp!==fin1 && camp!==fin2){
+    errors.push(`El campeón (${camp}) debe ser uno de los dos finalistas`);
+  }
+
+  // Goleador obligatorio
+  if(!document.getElementById('inp-gol').value.trim()) errors.push('Falta el Máximo Goleador');
 
   return errors;
 }
 
 function collectMatches(){
+  saveCurrentGroupToDom(); // guarda el grupo visible antes de recoger todo
   const m={};
   GROUP_MATCHES.forEach(match=>{
-    const h=document.getElementById(`p_${match.id}_h`), a=document.getElementById(`p_${match.id}_a`);
-    if(h&&a&&h.value!==''&&a.value!=='') m[match.id]={home:parseInt(h.value),away:parseInt(a.value)};
+    // Lee del DOM si está visible, si no de tempMatches
+    const h=document.getElementById(`p_${match.id}_h`);
+    const a=document.getElementById(`p_${match.id}_a`);
+    if(h&&a&&h.value!==''&&a.value!==''){
+      m[match.id]={home:parseInt(h.value),away:parseInt(a.value)};
+    } else {
+      const tmp=tempMatches[match.id];
+      if(tmp&&tmp.home!==''&&tmp.away!=='') m[match.id]={home:parseInt(tmp.home),away:parseInt(tmp.away)};
+    }
   });
   return m;
 }
@@ -757,6 +933,8 @@ window.unlockAdmin=function(){
   } else { document.getElementById('pwd-err').textContent='Contraseña incorrecta'; }
 };
 
+
+
 window.tabAdmin=async function(tab,btn){
   document.querySelectorAll('#admin-panel .tab').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
@@ -764,35 +942,48 @@ window.tabAdmin=async function(tab,btn){
   const body=document.getElementById('admin-body');
 
   if(tab==='grupos'){
-    const resultsDoc=await fsGet('config','results');
-    const results=resultsDoc?.data||{}; hideLoad();
-    body.innerHTML=`<div class="alert alert-info">Introduce los resultados reales. Los puntos se calculan automáticamente.</div>`+
-      Object.keys(GROUPS).map(g=>{
-        const matches=GROUP_MATCHES.filter(m=>m.group===g);
-        return `<div class="card"><div class="card-title">Grupo ${g}</div>
-          ${matches.map(m=>{
-            const r=results[m.id]||{};
-            return `<div class="match-row">
-              <div class="t-name">${m.home}</div>
-              <div><div class="score-wrap">
-                <input type="number" class="score-in" min="0" max="30" id="r_${m.id}_h" value="${r.home??''}" placeholder="—">
-                <span class="sep">—</span>
-                <input type="number" class="score-in" min="0" max="30" id="r_${m.id}_a" value="${r.away??''}" placeholder="—">
-              </div></div>
-              <div class="t-name r">${m.away}</div>
-            </div>`;
-          }).join('')}
-          <div style="margin-top:.8rem"><button class="btn btn-success btn-sm" onclick="saveGroupResults('${g}')">Guardar Grupo ${g}</button></div>
-        </div>`;
-      }).join('');
+    const [resultsDoc, configDoc] = await Promise.all([
+      fsGet('config','results'), fsGet('config','deadline')
+    ]);
+    const results=resultsDoc?.data||{};
+    const deadline=configDoc?.value||'';
+    hideLoad();
+
+    // Admin ve todos los grupos a la vez con tabs para no perder datos
+    const adminTempR = {}; // temp store for admin results
+
+    body.innerHTML=`<div class="alert alert-info">Introduce los resultados reales partido a partido. Guarda cada grupo por separado.</div>
+      <div class="tabs" id="admin-group-tabs">${Object.keys(GROUPS).map((g,i)=>
+        `<button class="tab ${i===0?'active':''}" onclick="adminShowGroup('${g}',this)">Grupo ${g}</button>`
+      ).join('')}</div>
+      <div id="admin-group-wrap"></div>`;
+
+    // Store results in window for admin tab switching
+    window._adminResults = {...results};
+    window._adminCurrentGroup = 'A';
+
+    adminRenderGroup('A', results);
 
   } else if(tab==='clasificados'){
     const classifiedDoc=await fsGet('config','classified');
     const classified=classifiedDoc?.data||{}; hideLoad();
-    const mk=(phase,count,prefix,label,pts)=>`<div class="card"><div class="card-title">${label} — ${pts} pts c/u</div>
-      <div class="g4">${Array.from({length:count},(_,i)=>`<div><label>Equipo ${i+1}</label>${teamSel('a'+prefix+i,classified[phase]?.[i]||'')}</div>`).join('')}</div>
-      <div style="margin-top:.8rem"><button class="btn btn-success btn-sm" onclick="saveClassified('${phase}',${count},'a${prefix}')">Guardar</button></div>
-    </div>`;
+
+    // Use teamsByGroup for proper grouped selects
+    function adminTeamSel(id, val){
+      return `<select id="${id}">${teamsByGroup(null)}</select>`;
+    }
+    function setVal(id,val){ setTimeout(()=>{ const el=document.getElementById(id); if(el&&val) el.value=val; },50); }
+
+    const mk=(phase,count,prefix,label,pts)=>{
+      const html=`<div class="card"><div class="card-title">${label} — ${pts} pts c/u</div>
+        <div class="g4">${Array.from({length:count},(_,i)=>`<div><label>Equipo ${i+1}</label>${adminTeamSel('a'+prefix+i,'')}</div>`).join('')}</div>
+        <div style="margin-top:.8rem"><button class="btn btn-success btn-sm" onclick="saveClassified('${phase}',${count},'a${prefix}')">Guardar</button></div>
+      </div>`;
+      // Restore values after render
+      (classified[phase]||[]).forEach((v,i)=>setVal('a'+prefix+i,v));
+      return html;
+    };
+
     body.innerHTML=
       mk('32avos',32,'c32_','Clasificados a 32avos',10)+
       mk('octavos',16,'c16_','Clasificados a Octavos',15)+
@@ -800,15 +991,22 @@ window.tabAdmin=async function(tab,btn){
       mk('semis',4,'cSF_','Clasificados a Semis',25)+
       `<div class="card"><div class="card-title">Finalistas — 30 pts c/u</div>
         <div class="g2">
-          <div><label>Finalista 1</label>${teamSel('afin0',classified.finalistas?.[0]||'')}</div>
-          <div><label>Finalista 2</label>${teamSel('afin1',classified.finalistas?.[1]||'')}</div>
+          <div><label>Finalista 1</label><select id="afin0">${teamsByGroup(null)}</select></div>
+          <div><label>Finalista 2</label><select id="afin1">${teamsByGroup(null)}</select></div>
         </div>
         <div style="margin-top:.8rem"><button class="btn btn-success btn-sm" onclick="saveFinalistas()">Guardar</button></div>
       </div>
       <div class="card"><div class="card-title">Campeón — 50 pts</div>
-        ${teamSel('acampeon',classified.campeon||'')}
+        <select id="acampeon">${teamsByGroup(null)}</select>
         <div style="margin-top:.8rem"><button class="btn btn-success btn-sm" onclick="saveCampeon()">Guardar</button></div>
       </div>`;
+
+    // Restore finalistas and campeon
+    setTimeout(()=>{
+      if(classified.finalistas?.[0]) document.getElementById('afin0').value=classified.finalistas[0];
+      if(classified.finalistas?.[1]) document.getElementById('afin1').value=classified.finalistas[1];
+      if(classified.campeon) document.getElementById('acampeon').value=classified.campeon;
+    },100);
 
   } else if(tab==='goleador'){
     const gDoc=await fsGet('config','goleador'); hideLoad();
@@ -826,24 +1024,95 @@ window.tabAdmin=async function(tab,btn){
     const names=Object.keys(participantsSnap);
     body.innerHTML=`<div class="card"><div class="card-title">Participantes (${names.length})</div>
       ${!names.length?'<div style="color:var(--gray)">Sin participantes aún</div>':
-        names.map(n=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:.55rem 0;border-bottom:1px solid rgba(255,255,255,.04);">
-          <div><strong>${n}</strong> <span class="badge b-gold" style="margin-left:.4rem">${scoreParticipant(participantsSnap[n],results,classified,goleador).total} pts</span></div>
-          <button class="btn btn-danger btn-sm" onclick="deletePlayer('${n}')">Eliminar</button>
-        </div>`).join('')}
+        names.map(n=>{
+          const sealed=participantsSnap[n].sealed;
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:.55rem 0;border-bottom:1px solid rgba(255,255,255,.04);gap:.5rem;flex-wrap:wrap;">
+            <div>
+              <strong>${n}</strong>
+              <span class="badge b-gold" style="margin-left:.4rem">${scoreParticipant(participantsSnap[n],results,classified,goleador).total} pts</span>
+              ${sealed?'<span class="badge" style="margin-left:.4rem;background:rgba(225,45,57,.15);color:#FF6B75">🔒 Sellado</span>':'<span class="badge b-green" style="margin-left:.4rem">Editable</span>'}
+            </div>
+            <div style="display:flex;gap:.4rem;">
+              ${sealed?`<button class="btn btn-ghost btn-sm" onclick="unsealPlayer('${n}')">Dessellar</button>`:''}
+              <button class="btn btn-danger btn-sm" onclick="deletePlayer('${n}')">Eliminar</button>
+            </div>
+          </div>`;
+        }).join('')}
       <div style="margin-top:1.4rem"><button class="btn btn-danger btn-sm" onclick="resetAll()">⚠️ Resetear TODO</button></div>
+    </div>`;
+  } else if(tab==='config'){
+    const configDoc=await fsGet('config','deadline'); hideLoad();
+    const dl=configDoc?.value||'';
+    body.innerHTML=`<div class="card">
+      <div class="card-title">⚙️ Fecha límite de registro</div>
+      <div class="note">Después de esta fecha y hora nadie podrá registrarse ni editar pronósticos. El primer partido es el 11 de junio a las 22:00h (hora española): <strong>2026-06-11T22:00</strong></div>
+      <div style="max-width:300px;margin:.8rem 0;">
+        <label>Fecha y hora límite</label>
+        <input type="datetime-local" id="a-deadline" value="${dl}">
+      </div>
+      <button class="btn btn-success btn-sm" onclick="saveDeadline()">Guardar</button>
+      ${dl?`<div style="margin-top:.8rem;font-size:.82rem;color:var(--green)">✅ Límite: <strong>${new Date(dl).toLocaleString('es-ES')}</strong></div>`:'<div style="margin-top:.8rem;font-size:.82rem;color:var(--gray)">Sin límite — registro abierto</div>'}
     </div>`;
   }
 };
+function adminSaveCurrentGroup(){
+  if(!window._adminCurrentGroup) return;
+  const g = window._adminCurrentGroup;
+  GROUP_MATCHES.filter(m=>m.group===g).forEach(m=>{
+    const h=document.getElementById(`r_${m.id}_h`);
+    const a=document.getElementById(`r_${m.id}_a`);
+    if(h&&a) window._adminResults[m.id]={home:h.value,away:a.value,_partial:true};
+  });
+}
+
+function adminRenderGroup(g, results){
+  const matches=GROUP_MATCHES.filter(m=>m.group===g);
+  document.getElementById('admin-group-wrap').innerHTML=`
+    <div class="card">
+      <div class="card-title">Grupo ${g}</div>
+      ${matches.map(m=>{
+        // Use temp if available, else Firebase value
+        const tmp=window._adminResults?.[m.id];
+        const r=(!tmp?._partial&&results[m.id])||tmp||{};
+        return `<div class="match-row">
+          <div class="t-name">${m.home}</div>
+          <div><div class="score-wrap">
+            <input type="number" class="score-in" min="0" max="30" id="r_${m.id}_h" value="${r.home??''}" placeholder="—">
+            <span class="sep">—</span>
+            <input type="number" class="score-in" min="0" max="30" id="r_${m.id}_a" value="${r.away??''}" placeholder="—">
+          </div><div class="m-grp">${m.date}</div></div>
+          <div class="t-name r">${m.away}</div>
+        </div>`;
+      }).join('')}
+      <div style="margin-top:.8rem"><button class="btn btn-success btn-sm" onclick="saveGroupResults('${g}')">Guardar Grupo ${g}</button></div>
+    </div>`;
+}
+
+window.adminShowGroup=function(g,btn){
+  adminSaveCurrentGroup();
+  document.querySelectorAll('#admin-group-tabs .tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  window._adminCurrentGroup=g;
+  adminRenderGroup(g, window._adminResults||{});
+};
 
 window.saveGroupResults=async function(g){
+  adminSaveCurrentGroup();
   showLoad();
   const resultsDoc=await fsGet('config','results');
   const results=resultsDoc?.data||{};
   GROUP_MATCHES.filter(m=>m.group===g).forEach(m=>{
-    const h=document.getElementById(`r_${m.id}_h`),a=document.getElementById(`r_${m.id}_a`);
-    if(h&&a&&h.value!==''&&a.value!=='') results[m.id]={home:parseInt(h.value),away:parseInt(a.value)};
+    const tmp=window._adminResults?.[m.id];
+    const h=tmp?.home, a=tmp?.away;
+    if(h!==''&&a!==''&&h!==undefined&&a!==undefined){
+      results[m.id]={home:parseInt(h),away:parseInt(a)};
+    }
   });
   await fsSet('config','results',{data:results});
+  // Update local store without _partial flag
+  GROUP_MATCHES.filter(m=>m.group===g).forEach(m=>{
+    if(results[m.id]) window._adminResults[m.id]=results[m.id];
+  });
   hideLoad(); toast(`Grupo ${g} guardado ✅`);
 };
 
@@ -880,6 +1149,23 @@ window.saveGoleadorAdmin=async function(){
   hideLoad(); toast('Goleador guardado ✅');
 };
 
+window.saveDeadline=async function(){
+  const val=document.getElementById('a-deadline')?.value||'';
+  showLoad();
+  await fsSet('config','deadline',{value:val});
+  hideLoad(); toast('Fecha límite guardada ✅');
+  tabAdmin('config', null);
+};
+
+window.unsealPlayer=async function(name){
+  if(!confirm(`¿Dessellar los pronósticos de ${name}? Podrá volver a editarlos.`)) return;
+  showLoad();
+  const p=await fsGet('participants',name);
+  if(p){ await fsSet('participants',name,{...p,sealed:false}); }
+  hideLoad(); toast(`${name} dessellado`);
+  tabAdmin('jugadores',null);
+};
+
 window.deletePlayer=async function(name){
   if(!confirm(`¿Eliminar a ${name}?`)) return;
   showLoad();
@@ -904,14 +1190,20 @@ window.downloadPDF = async function(){
   if(!currentUser){ toast('Primero guarda tus pronósticos','err'); return; }
   showLoad();
 
-  // Lee de Firebase para tener datos guardados + resultados reales
   const [p, resultsDoc] = await Promise.all([
     fsGet('participants', currentUser),
     fsGet('config','results')
   ]);
-  hideLoad();
 
-  if(!p){ toast('Guarda primero tus pronósticos','err'); return; }
+  if(!p){ hideLoad(); toast('Guarda primero tus pronósticos','err'); return; }
+
+  // SELLAR pronósticos al imprimir
+  if(!p.sealed){
+    await fsSet('participants', currentUser, { ...p, sealed: true });
+    cachedExisting = { ...p, sealed: true };
+  }
+
+  hideLoad();
 
   const matches   = p.matches || {};
   const results   = resultsDoc?.data || {};
