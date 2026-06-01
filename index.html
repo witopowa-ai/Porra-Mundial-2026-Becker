@@ -138,7 +138,7 @@ label{display:block;font-size:.7rem;color:var(--gray);margin-bottom:.2rem;letter
     <div class="logo-divider"></div>
     <div>
       <div class="logo-title">Porra Becker Ibérica</div>
-      <div class="logo-sub">Mundial 2026 · USA · Canadá · México · v5</div>
+      <div class="logo-sub">Mundial 2026 · USA · Canadá · México · v6</div>
     </div>
   </div>
   <nav class="nav">
@@ -252,18 +252,18 @@ label{display:block;font-size:.7rem;color:var(--gray);margin-bottom:.2rem;letter
         <span class="badge b-gold" style="font-size:.85rem;padding:.2rem .7rem">5 pts</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.05);">
-        <span style="color:var(--gray2)">+ Acertar los goles de uno de los dos equipos</span>
+        <span style="color:var(--gray2)">Acertar los goles de uno de los dos equipos <em style="color:var(--gray)">(aunque falles el ganador)</em></span>
         <span class="badge b-blue" style="font-size:.85rem;padding:.2rem .7rem">+3 pts</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.05);">
-        <span style="color:var(--gray2)">+ Acertar el marcador exacto completo (ambos equipos)</span>
-        <span class="badge b-blue" style="font-size:.85rem;padding:.2rem .7rem">+3 pts más = 6 pts extra</span>
+        <span style="color:var(--gray2)">Acertar el marcador exacto completo (ambos equipos)</span>
+        <span class="badge b-blue" style="font-size:.85rem;padding:.2rem .7rem">+3 pts más</span>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem .8rem;background:rgba(240,180,41,.05);border-radius:4px;margin-top:.3rem;">
-        <span style="font-weight:600;color:var(--gold)">Máximo por partido: ganador + marcador exacto</span>
+        <span style="font-weight:600;color:var(--gold)">Máximo por partido (ganador + goles + marcador exacto)</span>
         <span class="badge b-gold" style="font-size:.9rem;padding:.25rem .8rem">11 pts</span>
       </div>
-      <div style="font-size:.76rem;color:var(--gray);padding:.4rem 0;">Ejemplo: pronosticas 2-1 y el resultado es 2-1 → 5 (ganador) + 3 (goles de equipo A) + 3 (marcador exacto) = <strong style="color:var(--white)">11 pts</strong>. Si pronosticas 2-0 y sale 2-1 → 5 + 3 = <strong style="color:var(--white)">8 pts</strong> (acertaste ganador y los goles de un equipo).</div>
+      <div style="font-size:.76rem;color:var(--gray);padding:.4rem 0;">Los tres bonos son <strong style="color:var(--white)">independientes y acumulables</strong>. Ejemplos:<br>• Pronosticas 2-1 y sale 2-1 → 5 (ganador) + 3 (goles) + 3 (exacto) = <strong style="color:var(--white)">11 pts</strong>.<br>• Pronosticas 2-2 y sale 1-2 → fallas el ganador, pero acertaste los 2 goles del equipo visitante → <strong style="color:var(--white)">3 pts</strong>.<br>• Pronosticas 2-0 y sale 2-1 → 5 (ganador) + 3 (goles del local) = <strong style="color:var(--white)">8 pts</strong>.</div>
     </div>
   </div>
 
@@ -609,15 +609,22 @@ function resolveSlot(slot, standings, thirds){
 
 
 // ── SCORING ─────────────────────────────────────────────────
+// Opción B: puntos independientes y acumulables.
+//  - Acertar ganador/empate: 5 pts (aunque falles los goles)
+//  - Acertar los goles de uno de los dos equipos: +3 pts (aunque falles el ganador)
+//  - Acertar el marcador exacto completo: +3 pts adicionales (= 6 extra sobre el ganador)
 function scoreMatch(pred,real){
   if(!real||real.home===''||real.away==='') return 0;
   const pH=parseInt(pred.home),pA=parseInt(pred.away);
   const rH=parseInt(real.home),rA=parseInt(real.away);
   if(isNaN(pH)||isNaN(pA)) return 0;
+  let pts=0;
+  // 1) Ganador / empate acertado
   const pW=pH>pA?'H':pA>pH?'A':'D',rW=rH>rA?'H':rA>rH?'A':'D';
-  if(pW!==rW) return 0;
-  let pts=5;
+  if(pW===rW) pts+=5;
+  // 2) Goles de uno de los dos equipos acertados (independiente del ganador)
   if(pH===rH||pA===rA) pts+=3;
+  // 3) Marcador exacto completo: +3 adicionales
   if(pH===rH&&pA===rA) pts+=3;
   return pts;
 }
