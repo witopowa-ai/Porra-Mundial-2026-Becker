@@ -1061,7 +1061,6 @@ window.tabPartidos=async function(tab,btn){
     const mkList=(phase,label,pts)=>{
       const real=(classified[phase]||[]).filter(Boolean);
       return `<div style="margin-bottom:1.1rem">
-        <div style="font-size:.78rem;color:var(--gold);font-family:'Barlow Condensed',sans-      return `<div style="margin-bottom:1.1rem">
         <div style="font-size:.78rem;color:var(--gold);font-family:'Barlow Condensed',sans-serif;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.38rem">${label} — ${pts} pts c/u</div>
         <div>${real.length?real.map(t=>`<span class="badge b-blue" style="margin:2px">${t}</span>`).join(''):'<span style="color:var(--gray);font-size:.8rem">Sin definir</span>'}</div>
       </div>`;
