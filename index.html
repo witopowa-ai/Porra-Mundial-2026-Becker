@@ -1330,16 +1330,6 @@ window.downloadPDF = async function(){
   win.document.close();
 };
 
-  // Group matches by group
-  const byGroup = {};
-  GROUP_MATCHES.forEach(m => {
-    if(!byGroup[m.group]) byGroup[m.group] = [];
-    const pred = matches[m.id];
-    byGroup[m.group].push({ ...m, pred });
-  });
-
-
-
 showLoad();
 await renderRanking();
 hideLoad();
