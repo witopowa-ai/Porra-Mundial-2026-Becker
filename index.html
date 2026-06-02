@@ -138,7 +138,7 @@ label{display:block;font-size:.7rem;color:var(--gray);margin-bottom:.2rem;letter
     <div class="logo-divider"></div>
     <div>
       <div class="logo-title">Porra Becker Ibérica</div>
-      <div class="logo-sub">Mundial 2026 · USA · Canadá · México · v7</div>
+      <div class="logo-sub">Mundial 2026 · USA · Canadá · México · v8</div>
     </div>
   </div>
   <nav class="nav">
@@ -174,10 +174,12 @@ label{display:block;font-size:.7rem;color:var(--gray);margin-bottom:.2rem;letter
     <div class="card-title">¿Quién eres?</div>
     <div style="display:flex;gap:.72rem;align-items:flex-end;flex-wrap:wrap;">
       <div style="flex:1;min-width:160px;"><label>Tu nombre</label>
-        <input id="inp-name" type="text" placeholder="Escribe tu nombre..." maxlength="30" onkeydown="if(event.key==='Enter')loadUser()">
+        <input id="inp-name" type="text" placeholder="Escribe tu nombre..." maxlength="30" onkeydown="if(event.key==='Enter')loadUser(false)">
       </div>
-      <button class="btn btn-primary" onclick="loadUser()">Continuar →</button>
+      <button class="btn btn-ghost" onclick="loadUser(true)">👁️ Ver mis pronósticos</button>
+      <button class="btn btn-primary" onclick="loadUser(false)">✏️ Editar / Crear</button>
     </div>
+    <div class="note" style="margin-top:.6rem;">Pulsa <strong>«Ver»</strong> para revisar tus pronósticos sin riesgo de modificarlos. Pulsa <strong>«Editar / Crear»</strong> solo si quieres cambiar algo o eres nuevo.</div>
     <div id="name-msg" style="margin-top:.55rem;"></div>
   </div>
 
@@ -770,13 +772,13 @@ const tempMatches={};
 window.addEventListener('beforeunload',function(e){
   const formVisible=!document.getElementById('prono-form').classList.contains('hidden');
   const sealed=cachedExisting?.sealed;
-  if(currentUser&&formVisible&&!sealed){
+  if(currentUser&&formVisible&&!sealed&&!window._viewOnly){
     e.preventDefault();e.returnValue='';
   }
 });
 
 function resetPronoForm(){
-  currentUser=null;cachedExisting=null;
+  currentUser=null;cachedExisting=null;window._viewOnly=false;
   Object.keys(tempMatches).forEach(k=>delete tempMatches[k]);
   document.getElementById('step-name').classList.remove('hidden');
   document.getElementById('prono-form').classList.add('hidden');
@@ -784,7 +786,7 @@ function resetPronoForm(){
   document.getElementById('name-msg').innerHTML='';
 }
 
-window.loadUser=async function(){
+window.loadUser=async function(readOnly){
   const name=document.getElementById('inp-name').value.trim();
   if(!name){document.getElementById('name-msg').innerHTML='<div class="alert alert-err">Escribe tu nombre</div>';return;}
   showLoad();
@@ -792,6 +794,9 @@ window.loadUser=async function(){
   hideLoad();
   const dl=deadlineDoc?.value||'';
   const pastDeadline=dl&&new Date()>new Date(dl);
+  if(readOnly&&!existing){
+    document.getElementById('name-msg').innerHTML='<div class="alert alert-err">No hay ninguna porra guardada con ese nombre. Si eres nuevo, pulsa «Editar / Crear».</div>';return;
+  }
   if(pastDeadline&&!existing){
     document.getElementById('name-msg').innerHTML='<div class="alert alert-err">⏰ El plazo de registro ha terminado. No puedes apuntarte.</div>';return;
   }
@@ -803,21 +808,36 @@ window.loadUser=async function(){
       if(v&&v.home!==undefined&&v.away!==undefined) tempMatches[id]={home:String(v.home),away:String(v.away)};
     });
   }
+  // Modo solo lectura: si lo pide el usuario, o si está sellado, o si pasó el plazo
   const sealed=existing?.sealed||(pastDeadline&&existing);
-  document.getElementById('prono-status').innerHTML=sealed
-    ?`<strong>🔒 ${existing?.sealed?'Porra sellada y enviada.':'Plazo cerrado.'}</strong> Ya no puedes modificar tus pronósticos. Si hay error, contacta con Jorge.`
-    :existing?`Editando pronósticos de <strong>${name}</strong>. Puedes guardar a medias y volver.`
-    :`Nuevo participante: <strong>${name}</strong>. Rellena y guarda cuando quieras. Cuando termines del todo, pulsa «Enviar y descargar».`;
+  const lockForm=readOnly||sealed;
+  window._viewOnly=!!readOnly;
+  if(readOnly){
+    document.getElementById('prono-status').innerHTML=`<strong>👁️ Modo consulta.</strong> Estás viendo los pronósticos de <strong>${name}</strong> sin posibilidad de editar. Para cambiar algo, vuelve atrás y pulsa «Editar / Crear».`;
+  } else {
+    document.getElementById('prono-status').innerHTML=sealed
+      ?`<strong>🔒 ${existing?.sealed?'Porra sellada y enviada.':'Plazo cerrado.'}</strong> Ya no puedes modificar tus pronósticos. Si hay error, contacta con Jorge.`
+      :existing?`Editando pronósticos de <strong>${name}</strong>. Puedes guardar a medias y volver.`
+      :`Nuevo participante: <strong>${name}</strong>. Rellena y guarda cuando quieras. Cuando termines del todo, pulsa «Enviar y descargar».`;
+  }
   document.getElementById('step-name').classList.add('hidden');
   document.getElementById('prono-form').classList.remove('hidden');
   buildGroupTabs(existing);
   buildKOInputs(existing);
-  if(sealed){
+  if(lockForm){
     setTimeout(()=>{
       document.querySelectorAll('#prono-form input,#prono-form select').forEach(el=>el.disabled=true);
-      document.getElementById('btn-save').disabled=true;
-      document.getElementById('btn-save').style.opacity='.3';
+      const bs=document.getElementById('btn-save');
+      const bp=document.getElementById('btn-pdf');
+      if(bs){bs.disabled=true;bs.style.display='none';}
+      // En modo consulta ocultamos también el botón de enviar/sellar; en sellado lo dejamos por si quiere re-descargar el PDF
+      if(readOnly&&bp){bp.style.display='none';}
     },250);
+  } else {
+    // Asegurar que los botones están visibles en modo edición normal
+    const bs=document.getElementById('btn-save');const bp=document.getElementById('btn-pdf');
+    if(bs){bs.disabled=false;bs.style.display='';}
+    if(bp){bp.style.display='';}
   }
 };
 
@@ -1040,6 +1060,7 @@ function validateForPDF(){
 
 window.saveUser=async function(){
   if(!currentUser)return;
+  if(window._viewOnly){toast('Estás en modo consulta. Vuelve y pulsa «Editar» para cambiar algo.','err');return;}
   showLoad();
   const data=buildDataObject();
   await fsSet('participants',currentUser,data);
@@ -1076,6 +1097,7 @@ window.cancelProno=()=>resetPronoForm();
 // ── PDF ──────────────────────────────────────────────────────
 window.downloadPDF=async function(){
   if(!currentUser){toast('Primero escribe tu nombre','err');return;}
+  if(window._viewOnly){toast('Estás en modo consulta.','err');return;}
   const errors=validateForPDF();
   if(errors.length){
     document.getElementById('save-msg').innerHTML=`<div class="alert alert-err">⚠️ Para enviar tu porra debes completarla:<br>${errors.join('<br>')}</div>`;
