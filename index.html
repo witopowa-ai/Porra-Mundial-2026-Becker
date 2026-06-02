@@ -140,7 +140,7 @@ label{display:block;font-size:.7rem;color:var(--gray);margin-bottom:.2rem;letter
     <div class="logo-divider"></div>
     <div>
       <div class="logo-title">Porra Becker Ibérica</div>
-      <div class="logo-sub">Mundial 2026 · USA · Canadá · México · v10</div>
+      <div class="logo-sub">Mundial 2026 · USA · Canadá · México · v13</div>
     </div>
   </div>
   <nav class="nav">
@@ -176,7 +176,7 @@ label{display:block;font-size:.7rem;color:var(--gray);margin-bottom:.2rem;letter
     <div class="card-title">¿Quién eres?</div>
     <div style="display:flex;gap:.72rem;align-items:flex-end;flex-wrap:wrap;">
       <div style="flex:1;min-width:160px;"><label>Tu nombre</label>
-        <input id="inp-name" type="text" placeholder="Escribe tu nombre..." maxlength="30" onkeydown="if(event.key==='Enter')loadUser(false)">
+        <input id="inp-name" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="nombre-porra" placeholder="Escribe tu nombre..." maxlength="30" onkeydown="if(event.key==='Enter')loadUser(false)">
       </div>
       <button class="btn btn-ghost" onclick="loadUser(true)">👁️ Ver mis pronósticos</button>
       <button class="btn btn-primary" onclick="loadUser(false)">✏️ Editar / Crear</button>
@@ -220,7 +220,7 @@ label{display:block;font-size:.7rem;color:var(--gray);margin-bottom:.2rem;letter
     <!-- GOLEADOR -->
     <div class="card hidden" id="card-goleador">
       <div class="card-title">👟 Máximo Goleador</div>
-      <div style="max-width:260px;"><label>Nombre del jugador (30 pts)</label><input id="inp-gol" type="text" placeholder="Ej: Mbappé..."></div>
+      <div style="max-width:260px;"><label>Nombre del jugador (30 pts)</label><input id="inp-gol" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="goleador-porra" placeholder="Ej: Mbappé..."></div>
     </div>
 
     <div class="flex-gap">
@@ -789,15 +789,23 @@ function resetPronoForm(){
 }
 
 window.loadUser=async function(readOnly){
-  const name=document.getElementById('inp-name').value.trim();
+  let name=document.getElementById('inp-name').value.trim();
   if(!name){document.getElementById('name-msg').innerHTML='<div class="alert alert-err">Escribe tu nombre</div>';return;}
+  // Limpiar caracteres que rompen Firestore (/, \, comillas) y espacios dobles
+  const cleaned=name.replace(/[\/\\'"\u0060]/g,'').replace(/\s+/g,' ').trim();
+  if(cleaned!==name){
+    name=cleaned;
+    document.getElementById('inp-name').value=name;
+  }
+  if(!name){document.getElementById('name-msg').innerHTML='<div class="alert alert-err">Ese nombre no es válido. Usa letras y números.</div>';return;}
+  if(name.length>30){document.getElementById('name-msg').innerHTML='<div class="alert alert-err">El nombre es demasiado largo.</div>';return;}
   showLoad();
   const [existing,deadlineDoc]=await Promise.all([fsGet('participants',name),fsGet('config','deadline')]);
   hideLoad();
   const dl=deadlineDoc?.value||'';
   const pastDeadline=dl&&new Date()>new Date(dl);
   if(readOnly&&!existing){
-    document.getElementById('name-msg').innerHTML='<div class="alert alert-err">No hay ninguna porra guardada con ese nombre. Si eres nuevo, pulsa «Editar / Crear».</div>';return;
+    document.getElementById('name-msg').innerHTML='<div class="alert alert-err">No hay ninguna porra guardada con ese nombre. Si eres nuevo, pulsa «Editar / Crear». Revisa que lo escribes igual que al registrarte (mayúsculas y acentos incluidos).</div>';return;
   }
   if(pastDeadline&&!existing){
     document.getElementById('name-msg').innerHTML='<div class="alert alert-err">⏰ El plazo de registro ha terminado. No puedes apuntarte.</div>';return;
@@ -894,7 +902,7 @@ function buildKOInputs(existing){
   bracketState = existing?.bracket ? {...existing.bracket} : {};
   tercerosManual = existing?.terceros ? {...existing.terceros} : {};
   resolvedSlots = existing?.resolvedSlots ? {...existing.resolvedSlots} : {};
-  if(existing?.goleador) document.getElementById('inp-gol').value=existing.goleador;
+  document.getElementById('inp-gol').value = existing?.goleador || '';
   // Si no hay resolvedSlots guardados pero los grupos están completos, recalcularlos
   if(!Object.keys(resolvedSlots).length && existing?.matches && Object.keys(existing.matches).length>=GROUP_MATCHES.length){
     const standings=computeGroupStandings(existing.matches);
@@ -935,12 +943,30 @@ window.checkGroups=function(){
   }
   // Calcular standings
   const standings=computeGroupStandings(matches);
+  const prevSlots=JSON.stringify(resolvedSlots);
   resolvedSlots={};
   Object.entries(standings).forEach(([g,teams])=>{
     resolvedSlots['1'+g]=teams[0];
     resolvedSlots['2'+g]=teams[1];
     resolvedSlots['3'+g]=teams[2]; // tercero del grupo
   });
+  // Si los clasificados han cambiado respecto a la última vez, limpiar terceros y ganadores
+  // que ya no sean válidos, para evitar un cuadro inconsistente.
+  if(prevSlots!==JSON.stringify(resolvedSlots)){
+    const validThirds=Object.keys(GROUPS).map(g=>resolvedSlots['3'+g]).filter(Boolean);
+    // Terceros: eliminar los que ya no son terceros válidos
+    Object.keys(tercerosManual).forEach(k=>{
+      if(tercerosManual[k] && !validThirds.includes(tercerosManual[k])) delete tercerosManual[k];
+    });
+    // Ganadores de 16avos: eliminar los que ya no están en su partido
+    R32.forEach(m=>{
+      const t=getR32Teams(m);
+      const w=bracketState[m.id];
+      if(w && w!==t[0] && w!==t[1]) delete bracketState[m.id];
+    });
+    // Propagar limpieza a rondas superiores
+    propagateClear();
+  }
   document.getElementById('check-msg').innerHTML='<div class="alert alert-ok">✅ Cuadro generado. Elige los terceros y rellena el cuadro eliminatorio abajo.</div>';
   document.getElementById('card-terceros').classList.remove('hidden');
   document.getElementById('card-bracket').classList.remove('hidden');
@@ -1439,7 +1465,7 @@ window.tabAdmin=async function(tab,btn){
   } else if(tab==='goleador'){
     const gDoc=await fsGet('config','goleador');hideLoad();
     body.innerHTML=`<div class="card"><div class="card-title">Máximo Goleador — 30 pts</div>
-      <div style="max-width:260px"><label>Nombre del jugador</label><input type="text" id="a-gol" value="${gDoc?.value||''}" placeholder="Ej: Mbappé..."></div>
+      <div style="max-width:260px"><label>Nombre del jugador</label><input type="text" id="a-gol" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="goleador-admin" value="${gDoc?.value||''}" placeholder="Ej: Mbappé..."></div>
       <div style="margin-top:.8rem"><button class="btn btn-success btn-sm" onclick="saveGoleadorAdmin()">Guardar</button></div>
     </div>`;
 
@@ -1554,7 +1580,10 @@ window.deletePlayer=async function(name){
   await fsDel('participants',name);hideLoad();toast(`${name} eliminado`);tabAdmin('jugadores',null);
 };
 window.resetAll=async function(){
-  if(!confirm('⚠️ ¿Resetear TODOS los datos?'))return;showLoad();
+  const r=prompt('⚠️ PELIGRO: esto BORRARÁ todas las porras y resultados de forma irreversible.\n\nSi estás seguro, escribe la palabra: BORRAR');
+  if(r===null) return;
+  if(r.trim().toUpperCase()!=='BORRAR'){ toast('Cancelado. No se ha borrado nada.','err'); return; }
+  showLoad();
   const snap=await fsAll('participants');
   for(const n of Object.keys(snap))await fsDel('participants',n);
   await fsDel('config','results');await fsDel('config','classified');await fsDel('config','goleador');
