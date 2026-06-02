@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Porra Becker Ibérica — Mundial 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{--gold:#F0B429;--gold-dim:rgba(240,180,41,0.12);--red:#E12D39;--green:#27AB83;--bg:#07101E;--card:#0F1C30;--card2:#152238;--border:rgba(255,255,255,0.07);--white:#F0F4FF;--gray:#6B7FA3;--gray2:#8896AB;--becker:#1B3A6B;}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -138,7 +140,7 @@ label{display:block;font-size:.7rem;color:var(--gray);margin-bottom:.2rem;letter
     <div class="logo-divider"></div>
     <div>
       <div class="logo-title">Porra Becker Ibérica</div>
-      <div class="logo-sub">Mundial 2026 · USA · Canadá · México · v8</div>
+      <div class="logo-sub">Mundial 2026 · USA · Canadá · México · v10</div>
     </div>
   </div>
   <nav class="nav">
@@ -893,13 +895,34 @@ function buildKOInputs(existing){
   tercerosManual = existing?.terceros ? {...existing.terceros} : {};
   resolvedSlots = existing?.resolvedSlots ? {...existing.resolvedSlots} : {};
   if(existing?.goleador) document.getElementById('inp-gol').value=existing.goleador;
-  // Si ya hay grupos comprobados guardados, mostrar el cuadro
+  // Si no hay resolvedSlots guardados pero los grupos están completos, recalcularlos
+  if(!Object.keys(resolvedSlots).length && existing?.matches && Object.keys(existing.matches).length>=GROUP_MATCHES.length){
+    const standings=computeGroupStandings(existing.matches);
+    Object.entries(standings).forEach(([g,teams])=>{
+      resolvedSlots['1'+g]=teams[0];
+      resolvedSlots['2'+g]=teams[1];
+      resolvedSlots['3'+g]=teams[2];
+    });
+  }
+  // En modo consulta, ocultar el botón de comprobar grupos (no hace falta)
+  const checkBtn=document.querySelector('#check-msg')?.previousElementSibling;
+  const checkWrap=document.getElementById('check-msg')?.parentElement;
+  if(window._viewOnly && checkWrap){
+    checkWrap.style.display='none';
+  } else if(checkWrap){
+    checkWrap.style.display='';
+  }
+  // Si ya hay grupos comprobados/recalculados, mostrar el cuadro
   if(Object.keys(resolvedSlots).length){
     document.getElementById('card-terceros').classList.remove('hidden');
     document.getElementById('card-bracket').classList.remove('hidden');
     document.getElementById('card-goleador').classList.remove('hidden');
     buildTerceros();
     renderBracket();
+  } else {
+    document.getElementById('card-terceros').classList.add('hidden');
+    document.getElementById('card-bracket').classList.add('hidden');
+    document.getElementById('card-goleador').classList.add('hidden');
   }
 }
 
@@ -968,9 +991,9 @@ function getMatchTeams(m, round){
 }
 
 window.pickWinner=function(matchId, round, team){
+  if(window._viewOnly) return;
   if(!team) return;
   bracketState[matchId]=team;
-  // Limpiar rondas posteriores que dependían del valor anterior si cambió
   propagateClear();
   renderBracket();
 };
@@ -1066,17 +1089,28 @@ window.saveUser=async function(){
   await fsSet('participants',currentUser,data);
   cachedExisting=data;
   hideLoad();
-  document.getElementById('save-msg').innerHTML='<div class="alert alert-ok">✅ Progreso guardado. Puedes volver cuando quieras con tu nombre.</div>';
-  setTimeout(()=>document.getElementById('save-msg').innerHTML='',4000);
+  const n=Object.keys(data.matches).length;
+  if(n<GROUP_MATCHES.length){
+    document.getElementById('save-msg').innerHTML=`<div class="alert alert-ok">✅ Progreso guardado (${n}/${GROUP_MATCHES.length} partidos). Puedes volver cuando quieras con tu nombre para terminar.</div>`;
+  } else {
+    document.getElementById('save-msg').innerHTML='<div class="alert alert-ok">✅ Progreso guardado (todos los partidos completos). Recuerda pulsar «Enviar y descargar» cuando termines el cuadro.</div>';
+  }
+  setTimeout(()=>document.getElementById('save-msg').innerHTML='',5000);
 };
 
 function buildDataObject(){
+  // Combinar partidos: lo guardado previamente + lo que hay ahora en pantalla
+  // (collectMatches ya integra tempMatches, que se precargó con lo guardado).
+  // Como red de seguridad extra, fusionamos también con cachedExisting.
+  const collected=collectMatches();
+  const merged={...(cachedExisting?.matches||{})};
+  Object.entries(collected).forEach(([id,v])=>{ merged[id]=v; });
   // Los 32 equipos que el usuario tiene clasificados a 16avos
   const r32list=[];
   R32.forEach(m=>{ const t=getR32Teams(m); if(t[0])r32list.push(t[0]); if(t[1])r32list.push(t[1]); });
   return{
     name:currentUser,savedAt:new Date().toISOString(),
-    matches:collectMatches(),
+    matches:merged,
     resolvedSlots:{...resolvedSlots},
     terceros:{...tercerosManual},
     bracket:{...bracketState},
@@ -1220,12 +1254,68 @@ body{background:#07101E;color:#F0F4FF;font-family:'Barlow',sans-serif;padding:1.
   <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:#F0B429">${data.goleador||'—'}</div>
 </div>
 <div class="footer">Porra Becker Ibérica · Mundial 2026 · Sellado: ${new Date().toLocaleString('es-ES')} · Enviar PDF a Jorge</div>
-<script>window.onload=()=>{setTimeout(()=>window.print(),800);}<\/script>
 </body></html>`;
 
-  const win=window.open('','_blank');
-  win.document.write(html);
-  win.document.close();
+  // Extraer estilos y cuerpo para renderizar en un contenedor oculto
+  const styleMatch = html.match(/<style>([\s\S]*?)<\/style>/);
+  const bodyMatch = html.match(/<body>([\s\S]*?)<\/body>/);
+  const pdfStyles = styleMatch ? styleMatch[1] : '';
+  const pdfBody = bodyMatch ? bodyMatch[1] : html;
+
+  showLoad();
+  // Contenedor oculto a ancho fijo (A4 proporción) para render nítido
+  const holder = document.createElement('div');
+  holder.id = 'pdf-render-holder';
+  holder.style.cssText = 'position:fixed;left:-99999px;top:0;width:794px;background:#07101E;z-index:-1;';
+  // Aislar estilos del PDF dentro del contenedor
+  const scoped = pdfStyles
+    .replace(/body\s*{/g, '#pdf-render-holder{')
+    .replace(/\bbody\b/g, '#pdf-render-holder');
+  holder.innerHTML = `<style>${scoped}</style><div class="pdf-content">${pdfBody}</div>`;
+  document.body.appendChild(holder);
+
+  try{
+    // Esperar a que las fuentes y el layout estén listos
+    if(document.fonts && document.fonts.ready) await document.fonts.ready;
+    await new Promise(r=>setTimeout(r,350));
+
+    const canvas = await html2canvas(holder, {
+      scale: 2,
+      backgroundColor: '#07101E',
+      useCORS: true,
+      logging: false,
+      windowWidth: 794
+    });
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p','mm','a4');
+    const pageW = 210, pageH = 297;
+    const imgW = pageW;
+    const imgH = canvas.height * imgW / canvas.width;
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+
+    let heightLeft = imgH;
+    let position = 0;
+    pdf.addImage(imgData, 'JPEG', 0, position, imgW, imgH);
+    heightLeft -= pageH;
+    while(heightLeft > 0){
+      position -= pageH;
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, imgW, imgH);
+      heightLeft -= pageH;
+    }
+
+    const safeName = currentUser.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g,'').trim() || 'porra';
+    pdf.save(`Porra Becker - ${safeName}.pdf`);
+    hideLoad();
+    toast('PDF descargado ✅ Envíaselo a Jorge');
+  }catch(err){
+    hideLoad();
+    console.error(err);
+    toast('Error al generar el PDF','err');
+  }finally{
+    holder.remove();
+  }
 };
 
 // ── PARTIDOS ─────────────────────────────────────────────────
