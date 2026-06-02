@@ -138,7 +138,7 @@ label{display:block;font-size:.7rem;color:var(--gray);margin-bottom:.2rem;letter
     <div class="logo-divider"></div>
     <div>
       <div class="logo-title">Porra Becker Ibérica</div>
-      <div class="logo-sub">Mundial 2026 · USA · Canadá · México · v6</div>
+      <div class="logo-sub">Mundial 2026 · USA · Canadá · México · v7</div>
     </div>
   </div>
   <nav class="nav">
@@ -796,6 +796,13 @@ window.loadUser=async function(){
     document.getElementById('name-msg').innerHTML='<div class="alert alert-err">⏰ El plazo de registro ha terminado. No puedes apuntarte.</div>';return;
   }
   currentUser=name;cachedExisting=existing;
+  // Precargar TODOS los partidos guardados en tempMatches para no perder grupos no visibles
+  Object.keys(tempMatches).forEach(k=>delete tempMatches[k]);
+  if(existing?.matches){
+    Object.entries(existing.matches).forEach(([id,v])=>{
+      if(v&&v.home!==undefined&&v.away!==undefined) tempMatches[id]={home:String(v.home),away:String(v.away)};
+    });
+  }
   const sealed=existing?.sealed||(pastDeadline&&existing);
   document.getElementById('prono-status').innerHTML=sealed
     ?`<strong>🔒 ${existing?.sealed?'Porra sellada y enviada.':'Plazo cerrado.'}</strong> Ya no puedes modificar tus pronósticos. Si hay error, contacta con Jorge.`
